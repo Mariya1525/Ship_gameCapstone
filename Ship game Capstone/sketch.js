@@ -7,7 +7,7 @@ var water, ship, helicopter, bomb;
 var helicopterGroup, bombGroup;
 var score = 0;
 
-
+localStorage["HighScore"]=0;
 
 function preload(){
   skybg = loadImage("skybg.jpg");
@@ -15,28 +15,32 @@ function preload(){
   shipimg = loadImage("ship.png");
   helicopterimg = loadImage("helicopter.png");
   bombimg = loadImage("bomb.png");
+  restartimg=loadImage("gameOver.png");
 }
 
 function setup() {
   createCanvas(800, 450);
   
   //creating water ground
- 
- 
-  
+  water = createSprite(200,350,600,600);
+  water.addImage("water ground",waterbg);
   
   //creating ship
+  ship=createSprite(200,300,50,50);
+  ship.addImage("ship",shipimg);
+  ship.scale=0.4;
  
   
   //creating helicopter group
-
+  helicopterGroup=new Group();
 
   //creating bomb group
-  
+  bombGroup=new Group();
+
     
 
   //ship.debug = "true";
-
+ship.setCollider("rectangle",0,300,400,25)
 }
 
 function draw() {
@@ -44,6 +48,7 @@ function draw() {
   fill("yellow")
   textSize(15);
   text("SURVIVAL TIME: "+ score, 600,30);
+
   
     
   //gameState play
@@ -53,8 +58,9 @@ function draw() {
 
     
     //Call user defined function
-   
-    
+    createBomb();
+    spawnHelicopter();
+    spawnBomb();
     if(bombGroup.isTouching(ship)){
         gameState = END;
     }
@@ -67,9 +73,9 @@ function draw() {
    //water velocity becomes zero
 
    //destroy Helicopter group
-
+   helicopterGroup.destroyEach();
    //destroy bomb group
-    
+   bombGroup.destroyEach();
   
     
   }
@@ -99,8 +105,18 @@ function spawnHelicopter(){
 
 function spawnBomb(){
  // create bombs at random position
+ if(frameCount%500 === 0){
+   var bomb=createSprite(Math.round(random(50,350),40,10,10));
+   bomb.addImage(bombimg);
+   bomb.scale=0.3;
+   bomb.velocityX(-3,2);
+   bombGroup.add(bomb);
+ }
  //use Math.random
 }
+
+
+
 
 
 
