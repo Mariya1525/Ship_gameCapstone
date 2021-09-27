@@ -2,12 +2,12 @@ var PLAY = 1;
 var END = 0;
 var gameState = PLAY;
 
-var skybg, waterbg, shipimg, helicopterimg, bombimg;
+var skybg, waterbg, shipimg, helicopterimg, bombimg, restartimg;
 var water, ship, helicopter, bomb;
 var helicopterGroup, bombGroup;
 var score = 0;
 
-localStorage["HighScore"]=0;
+localStorage["HighScore"] = 0;
 
 function preload(){
   skybg = loadImage("skybg.jpg");
@@ -24,7 +24,7 @@ function setup() {
   //creating water ground
   water = createSprite(200,350,600,600);
   water.addImage("water ground",waterbg);
-  
+  shipimg.frameDelay=15;
   //creating ship
   ship=createSprite(200,300,50,50);
   ship.addImage("ship",shipimg);
@@ -36,11 +36,16 @@ function setup() {
 
   //creating bomb group
   bombGroup=new Group();
+  //creating restart button
+  restart=createSprite(400,200,200,250);
+  restart.addImage("restart",restartimg);
+  restart.scale=0.2;
 
+  score=0;
     
 
   //ship.debug = "true";
-ship.setCollider("rectangle",0,300,400,25)
+ship.setCollider("rectangle",0,0,400,400);
 }
 
 function draw() {
@@ -48,17 +53,23 @@ function draw() {
   fill("yellow")
   textSize(15);
   text("SURVIVAL TIME: "+ score, 600,30);
-
   
-    
   //gameState play
   if(gameState === PLAY){
+    restart.visible = false;
     //increase score
     score = score + Math.round(frameCount/300);
+    water.setVelocity(-2,0);
+
+    if(keyDown("left") && ship.position.x  > 60){
+      ship.position.x  -= 5;
+    }
+    if(keyDown("right") && ship.position.x  < 740){
+      ship.position.x +=  5;
+    }
 
     
     //Call user defined function
-    createBomb();
     spawnHelicopter();
     spawnBomb();
     if(bombGroup.isTouching(ship)){
@@ -71,12 +82,12 @@ function draw() {
   else if(gameState === END){
     ship.addImage("ship",restartimg)
    //water velocity becomes zero
-
+     water.setVelocity(0,0);
    //destroy Helicopter group
    helicopterGroup.destroyEach();
    //destroy bomb group
    bombGroup.destroyEach();
-  
+     
     
   }
   
@@ -105,15 +116,29 @@ function spawnHelicopter(){
 
 function spawnBomb(){
  // create bombs at random position
- if(frameCount%500 === 0){
-   var bomb=createSprite(Math.round(random(50,350),40,10,10));
-   bomb.addImage(bombimg);
-   bomb.scale=0.3;
-   bomb.velocityX(-3,2);
+ if(frameCount%150 === 0){
+   bomb=createSprite(random(200,600),90,20,20);
+   bomb.addImage("bomb falling",bombimg);
+   bomb.setVelocity(0,5);
+   bomb.scale=0.1;
+   bomb.lifetime=60;
    bombGroup.add(bomb);
  }
  //use Math.random
 }
+
+function reset(){
+  gameState = PLAY;
+  restart.visible = false;
+
+  if(localStorage["Highscore"]<score){
+    localStorage["Highscore"] = score;
+  }
+  console.log("HIGH SCORE IS: " + localStorage["Highscore"]);
+  score = 0;
+}
+
+
 
 
 
